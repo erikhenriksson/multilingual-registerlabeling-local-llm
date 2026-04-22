@@ -17,11 +17,14 @@ def main():
     llm = sgl.Engine(
         model_path=MODEL,
         tp_size=2,
-        mem_fraction_static=0.85,
-        context_length=1000,
+        mem_fraction_static=0.90,
+        context_length=4096,
         reasoning_parser="qwen3",
         trust_remote_code=True,
-        disable_cuda_graph=True,  # <-- add this
+        disable_cuda_graph=True,
+        max_running_requests=1,  # force the assertion to pass
+        mamba_ssm_dtype="bfloat16",  # halve mamba state size
+        mamba_full_memory_ratio=0.5,  # leave more room for KV
     )
 
     def generate(prompt: str, max_new_tokens: int = 200) -> str:
