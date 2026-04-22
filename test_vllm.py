@@ -4,7 +4,7 @@
 import os
 import time
 
-os.environ["HF_HOME"] = os.environ.get("LOCAL_SCRATCH", ".") + "/hf_cache"
+os.environ["HF_HOME"] = ".hf_cache"
 
 from vllm import LLM, SamplingParams
 
