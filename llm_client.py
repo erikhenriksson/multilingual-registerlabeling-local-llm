@@ -1,6 +1,7 @@
 # llm_client.py
 import json
 import os
+import time
 from typing import Type, TypeVar, overload
 
 os.environ.setdefault("HF_HOME", ".hf_cache")
@@ -23,8 +24,10 @@ class LLM:
         mem_fraction_static: float = 0.90,
         context_length: int = 4096,
         reasoning_parser: str | None = "qwen3",
+        verbose: bool = True,
     ):
         self.model = model
+        self.verbose = verbose
         self.tokenizer = AutoTokenizer.from_pretrained(model, trust_remote_code=True)
         self.engine = sgl.Engine(
             model_path=model,
@@ -78,12 +81,29 @@ class LLM:
         temperature=0.0,
     ):
         formatted = [self._format(p, system) for p in prompts]
+
         sampling = {"temperature": temperature, "max_new_tokens": max_new_tokens}
         if schema is not None:
             sampling["json_schema"] = json.dumps(schema.model_json_schema())
 
+        t0 = time.time()
         outs = self.engine.generate(formatted, sampling)
+        dt = time.time() - t0
+
         texts = [o["text"] for o in outs]
+
+        if self.verbose:
+            total_tokens = sum(
+                o.get("meta_info", {}).get("completion_tokens", len(t.split()))
+                for o, t in zip(outs, texts)
+            )
+            n = len(prompts)
+            per_seq = (total_tokens / dt / n) if dt > 0 and n > 0 else 0
+            agg = (total_tokens / dt) if dt > 0 else 0
+            print(
+                f"  [batch={n}: {total_tokens} tokens in {dt:.2f}s "
+                f"-> {agg:.1f} tok/s aggregate, {per_seq:.1f} tok/s per-seq]"
+            )
 
         if schema is None:
             return texts
