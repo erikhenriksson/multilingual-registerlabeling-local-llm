@@ -4,6 +4,7 @@ import os
 from typing import Type, TypeVar, overload
 
 os.environ.setdefault("HF_HOME", ".hf_cache")
+os.environ.setdefault("HF_TOKEN", "")
 
 import sglang as sgl
 from pydantic import BaseModel
