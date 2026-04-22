@@ -10,7 +10,7 @@ import time
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-MODEL = "Qwen/Qwen3.6-35B-A3B"
+MODEL = "Qwen/Qwen3.6-35B-A3B-FP8"
 
 print(f"HF_HOME={os.environ['HF_HOME']}")
 print("Loading tokenizer...")
