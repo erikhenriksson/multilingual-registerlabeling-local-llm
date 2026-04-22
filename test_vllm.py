@@ -1,37 +1,17 @@
 #!/usr/bin/env python3
-"""Fast Qwen3.6 generation via vLLM, no thinking."""
+"""Fast Qwen3.5 generation via vLLM, no thinking."""
 
 import os
 import time
 
-os.environ["HF_HOME"] = ".hf_cache"
+os.environ["HF_HOME"] = os.environ.get("LOCAL_SCRATCH", ".") + "/hf_cache"
 
 from vllm import LLM, SamplingParams
 
 MODEL = "Qwen/Qwen3.6-35B-A3B"
 
-print(f"HF_HOME={os.environ['HF_HOME']}")
-print("Loading model...")
 
-llm = LLM(
-    model=MODEL,
-    dtype="bfloat16",
-    tensor_parallel_size=2,  # Mahti GPU node = 4x A100 40GB
-    gpu_memory_utilization=0.90,
-    max_model_len=8192,  # lower = less KV memory reserved
-    enforce_eager=False,  # keep CUDA graphs
-    trust_remote_code=True,  # Qwen models sometimes need this
-)
-
-tok = llm.get_tokenizer()
-
-sampling_params = SamplingParams(
-    temperature=0.0,
-    max_tokens=200,
-)
-
-
-def generate(prompt: str, max_tokens: int = 200) -> str:
+def generate(llm, prompt: str, max_tokens: int = 200) -> str:
     msgs = [{"role": "user", "content": prompt}]
     sp = SamplingParams(temperature=0.0, max_tokens=max_tokens)
 
@@ -49,12 +29,29 @@ def generate(prompt: str, max_tokens: int = 200) -> str:
     return out.text
 
 
-# Warm-up (first call builds CUDA graphs)
-print("\nWarm-up:")
-_ = generate("Hi", max_tokens=10)
+def main():
+    print(f"HF_HOME={os.environ['HF_HOME']}")
+    print("Loading model...")
 
-print("\nGeneration 1:")
-print(generate('Type "I love Qwen3.6" backwards'))
+    llm = LLM(
+        model=MODEL,
+        dtype="bfloat16",
+        tensor_parallel_size=2,
+        gpu_memory_utilization=0.90,
+        max_model_len=8192,
+        enforce_eager=False,
+        trust_remote_code=True,
+    )
 
-print("\nGeneration 2:")
-print(generate("Explain MoE models in one paragraph."))
+    print("\nWarm-up:")
+    _ = generate(llm, "Hi", max_tokens=10)
+
+    print("\nGeneration 1:")
+    print(generate(llm, 'Type "I love Qwen3.6" backwards'))
+
+    print("\nGeneration 2:")
+    print(generate(llm, "Explain MoE models in one paragraph."))
+
+
+if __name__ == "__main__":
+    main()
