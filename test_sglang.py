@@ -18,7 +18,7 @@ def main():
         model_path=MODEL,
         tp_size=2,
         mem_fraction_static=0.85,
-        context_length=8192,
+        context_length=1000,
         reasoning_parser="qwen3",
         trust_remote_code=True,
         disable_cuda_graph=True,  # <-- add this
