@@ -16,7 +16,7 @@ print("Loading model...")
 llm = LLM(
     model=MODEL,
     dtype="bfloat16",
-    tensor_parallel_size=4,  # Mahti GPU node = 4x A100 40GB
+    tensor_parallel_size=2,  # Mahti GPU node = 4x A100 40GB
     gpu_memory_utilization=0.90,
     max_model_len=8192,  # lower = less KV memory reserved
     enforce_eager=False,  # keep CUDA graphs
