@@ -20,9 +20,14 @@ TEXTS = [
 
 SYSTEM = "You are a linguistic register classifier. Output JSON only."
 
-prompts = [f"Classify the register of: {t!r}" for t in TEXTS]
 
-with LLM() as llm:
-    results = llm.batch(prompts, schema=RegisterClassification, system=SYSTEM)
-    for text, r in zip(TEXTS, results):
-        print(f"{r.category:10s} ({r.confidence:.2f})  {text}")
+def main():
+    prompts = [f"Classify the register of: {t!r}" for t in TEXTS]
+    with LLM() as llm:
+        results = llm.batch(prompts, schema=RegisterClassification, system=SYSTEM)
+        for text, r in zip(TEXTS, results):
+            print(f"{r.category:10s} ({r.confidence:.2f})  {text}")
+
+
+if __name__ == "__main__":
+    main()
