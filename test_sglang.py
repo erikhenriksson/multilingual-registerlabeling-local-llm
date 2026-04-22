@@ -4,8 +4,7 @@
 import os
 import time
 
-os.environ["HF_HOME"] = os.environ.get("LOCAL_SCRATCH", ".") + "/hf_cache"
-
+os.environ["HF_HOME"] = ".hf_cache"
 import sglang as sgl
 
 MODEL = "Qwen/Qwen3.6-35B-A3B"
