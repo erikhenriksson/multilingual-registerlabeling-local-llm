@@ -19,7 +19,7 @@ class LLM:
 
     def __init__(
         self,
-        model: str = "Qwen/Qwen3.6-35B-A3B",
+        model: str = "Qwen/Qwen3.6-27B",
         tp_size: int = 2,
         mem_fraction_static: float = 0.90,
         context_length: int = 4096,
