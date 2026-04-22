@@ -16,11 +16,12 @@ def main():
 
     llm = sgl.Engine(
         model_path=MODEL,
-        tp_size=2,  # tensor parallel = num GPUs you allocated
+        tp_size=2,
         mem_fraction_static=0.85,
-        context_length=8192,  # lower than model default to save KV memory
-        reasoning_parser="qwen3",  # Qwen3.6 has thinking mode; this parses it
+        context_length=8192,
+        reasoning_parser="qwen3",
         trust_remote_code=True,
+        disable_cuda_graph=True,  # <-- add this
     )
 
     def generate(prompt: str, max_new_tokens: int = 200) -> str:
